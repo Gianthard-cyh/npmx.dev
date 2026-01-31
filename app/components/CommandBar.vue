@@ -71,10 +71,10 @@ const cmdList = [
   },
 ]
 
-const selected = ref(cmdList[0]?.id || '')
-const inputVal = ref('')
-const show = ref(false)
-const triggeringId = ref('')
+const selected = shallowRef(cmdList[0]?.id || '')
+const inputVal = shallowRef('')
+const show = shallowRef(false)
+const triggeringId = shallowRef('')
 const inputRef = useTemplateRef('inputRef')
 
 const { focused: inputFocused } = useFocus(inputRef)
