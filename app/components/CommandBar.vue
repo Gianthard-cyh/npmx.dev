@@ -25,7 +25,10 @@
             v-for="item in filteredCmdList"
             :key="item.id"
             class="flex-col items-center justify-between px-4 py-2 not-first:mt-2 hover:bg-bg-elevated select-none cursor-pointer rounded-md transition"
-            :class="{ 'bg-bg-subtle': item.id === selected }"
+            :class="{
+              'bg-bg-subtle': item.id === selected,
+              'trigger-anim': item.id === triggeringId,
+            }"
             @click="triggerCommand(item.id)"
           >
             <div class="text-fg">{{ item.name }}</div>
@@ -68,6 +71,7 @@ const cmdList = [
 const selected = ref(cmdList[0]?.id || '')
 const inputVal = ref('')
 const show = ref(false)
+const triggeringId = ref('')
 const inputRef = useTemplateRef('inputRef')
 
 const { focused: inputFocused } = useFocus(inputRef)
@@ -122,7 +126,11 @@ function toggle() {
 function triggerCommand(id: string) {
   const selectedItem = filteredCmdList.value.find(item => item.id === id)
   selectedItem?.handler?.()
-  close()
+  triggeringId.value = id
+  setTimeout(() => {
+    triggeringId.value = ''
+    close()
+  }, 100)
 }
 
 const handleKeydown = useThrottleFn((e: KeyboardEvent) => {
@@ -168,5 +176,26 @@ defineExpose({
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+@keyframes trigger-pulse {
+  0% {
+    transform: scale(1);
+    background-color: var(--bg-subtle);
+  }
+
+  50% {
+    transform: scale(0.96);
+    background-color: var(--bg-elevated);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: var(--bg-subtle);
+  }
+}
+
+.trigger-anim {
+  animation: trigger-pulse 0.1s ease-in-out;
 }
 </style>
