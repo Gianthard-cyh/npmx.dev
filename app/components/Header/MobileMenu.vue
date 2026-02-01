@@ -1,24 +1,32 @@
 <script setup lang="ts">
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
+
 const isOpen = defineModel<boolean>('open', { default: false })
 
 const { isConnected, npmUser, avatar: npmAvatar } = useConnector()
 const { user: atprotoUser } = useAtproto()
 
-const showConnectorModal = shallowRef(false)
-const showAuthModal = shallowRef(false)
+const navRef = useTemplateRef('navRef')
+const { activate, deactivate } = useFocusTrap(navRef, { allowOutsideClick: true })
 
 function closeMenu() {
   isOpen.value = false
 }
 
 function handleShowConnector() {
-  showConnectorModal.value = true
-  closeMenu()
+  const connectorModal = document.querySelector<HTMLDialogElement>('#connector-modal')
+  if (connectorModal) {
+    closeMenu()
+    connectorModal.showModal()
+  }
 }
 
 function handleShowAuth() {
-  showAuthModal.value = true
-  closeMenu()
+  const authModal = document.querySelector<HTMLDialogElement>('#auth-modal')
+  if (authModal) {
+    closeMenu()
+    authModal.showModal()
+  }
 }
 
 // Close menu on route change
@@ -26,15 +34,18 @@ const route = useRoute()
 watch(() => route.fullPath, closeMenu)
 
 // Close on escape
-onKeyStroke('Escape', () => {
-  if (isOpen.value) {
+onKeyStroke(
+  e => isKeyWithoutModifiers(e, 'Escape') && isOpen.value,
+  e => {
     isOpen.value = false
-  }
-})
+  },
+)
 
 // Prevent body scroll when menu is open
 const isLocked = useScrollLock(document)
 watch(isOpen, open => (isLocked.value = open))
+watch(isOpen, open => (open ? nextTick(activate) : deactivate()))
+onUnmounted(deactivate)
 </script>
 
 <template>
@@ -71,6 +82,7 @@ watch(isOpen, open => (isLocked.value = open))
         >
           <nav
             v-if="isOpen"
+            ref="navRef"
             class="absolute inset-ie-0 top-0 bottom-0 w-72 bg-bg border-is border-border shadow-xl flex flex-col"
           >
             <!-- Header -->
@@ -279,9 +291,5 @@ watch(isOpen, open => (isLocked.value = open))
         </Transition>
       </div>
     </Transition>
-
-    <!-- Modals -->
-    <ConnectorModal v-model:open="showConnectorModal" />
-    <AuthModal v-model:open="showAuthModal" />
   </Teleport>
 </template>
