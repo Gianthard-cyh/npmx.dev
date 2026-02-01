@@ -11,15 +11,6 @@ definePageMeta({
   alias: ['/package/:package(.*)*'],
 })
 
-registerScopedCommand({
-  id: 'package hello',
-  name: 'Hello',
-  description: 'Say hello to the package',
-  handler: async () => {
-    console.log(`Hello ${packageName.value}!`)
-  },
-})
-
 const router = useRouter()
 
 const { packageName, requestedVersion, orgName } = usePackageRoute()
@@ -1080,22 +1071,18 @@ function handleClick(event: MouseEvent) {
   grid-area: header;
   overflow-x: hidden;
 }
-
 .area-install {
   grid-area: install;
   overflow-x: hidden;
 }
-
 .area-vulns {
   grid-area: vulns;
   overflow-x: hidden;
 }
-
 .area-readme {
   grid-area: readme;
   overflow-x: hidden;
 }
-
 .area-sidebar {
   grid-area: sidebar;
 }
