@@ -1,8 +1,8 @@
 export default defineNuxtPlugin(() => {
-  const { register } = useCommandRegistry()
   const router = useRouter()
-
-  const { t } = useI18n()
+  const { $i18n } = useNuxtApp()
+  const t = $i18n.t
+  const { register } = useCommandRegistry()
 
   register({
     id: 'packages:search',
